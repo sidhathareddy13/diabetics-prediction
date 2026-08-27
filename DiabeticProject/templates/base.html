@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Diabetes Risk Predictor{% endblock %}</title>
+    <script>
+      (function () {
+        const theme = "{{ active_theme or 'light' }}";
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body class="app-body {% block body_class %}{% endblock %}" data-theme="{{ active_theme or 'light' }}">
+    {% if session.get('user_id') %}
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand-block">
+            <div class="brand-mark">♥</div>
+            <div>
+              <div class="brand-name">Diabetes Risk Predictor</div>
+            </div>
+          </div>
+
+          <nav class="nav-menu">
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('predict') }}" class="nav-link {% if request.path == '/predict' %}active{% endif %}">Test / Predict</a>
+            <a href="{{ url_for('analytics') }}" class="nav-link {% if request.path == '/analytics' %}active{% endif %}">Analytics</a>
+            <a href="{{ url_for('reminders') }}" class="nav-link {% if request.path.startswith('/reminders') %}active{% endif %}">Reminders</a>
+            <a href="{{ url_for('history') }}" class="nav-link {% if request.path.startswith('/history') %}active{% endif %}">History</a>
+            <a href="{{ url_for('reports') }}" class="nav-link {% if request.path.startswith('/reports') or request.path.startswith('/export') %}active{% endif %}">Reports</a>
+            <a href="{{ url_for('profile') }}" class="nav-link {% if request.path.startswith('/profile') %}active{% endif %}">Profile</a>
+            <a href="{{ url_for('settings') }}" class="nav-link {% if request.path.startswith('/settings') %}active{% endif %}">Settings</a>
+            <a href="{{ url_for('about') }}" class="nav-link {% if request.path == '/about' %}active{% endif %}">About</a>
+          </nav>
+
+          <div class="sidebar-footer">
+            <div class="user-chip">{{ session.get('user_name', 'User') }}</div>
+            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+          </div>
+        </aside>
+
+        <main class="main-panel">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Healthcare overview</p>
+              <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+          </header>
+
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    {% else %}
+      {% block auth_content %}{% endblock %}
+    {% endif %}
+  </body>
+</html>

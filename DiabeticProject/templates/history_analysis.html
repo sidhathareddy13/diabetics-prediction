@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction Analysis | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Prediction Analysis{% endblock %}
+
+{% block content %}
+<div class="detail-card card-surface">
+  <div class="page-header-row" style="padding: 0 0 18px; margin-bottom: 16px; border-bottom: 1px solid rgba(107,70,215,0.08);">
+    <div>
+      <p class="eyebrow">Selected assessment</p>
+      <h3>{{ prediction.created_at }}</h3>
+    </div>
+    <a href="{{ url_for('prediction_report_pdf', prediction_id=prediction.id) }}" class="primary-btn" target="_blank">Download Report (PDF)</a>
+  </div>
+
+  <div class="detail-grid">
+    <div><span>Risk Score</span><strong>{{ '%.1f'|format(prediction.risk_score) }}%</strong></div>
+    <div><span>Risk Category</span><strong>{{ prediction.risk_category }}</strong></div>
+    <div><span>Glucose</span><strong>{{ prediction.glucose }}</strong></div>
+    <div><span>Blood Pressure</span><strong>{{ prediction.blood_pressure }}</strong></div>
+    <div><span>BMI</span><strong>{{ prediction.bmi }}</strong></div>
+    <div><span>Age</span><strong>{{ prediction.age }}</strong></div>
+    <div><span>Insulin</span><strong>{{ prediction.insulin }}</strong></div>
+    <div><span>Remarks</span><strong>{{ prediction.remarks or '—' }}</strong></div>
+  </div>
+
+  <div class="recommendation-module" style="margin-top: 22px;">
+    <h3>Risk Interpretation</h3>
+    <p>{{ interpretation }}</p>
+  </div>
+
+  <div class="recommendation-module">
+    <h3>Recommendations for This Prediction</h3>
+    <div class="food-grid">
+      {% for item in recommendations.diet_more %}
+      <div class="food-card">
+        <div class="food-emoji">{{ item.emoji }}</div>
+        <div class="food-name">{{ item.name }}</div>
+        <p>{{ item.description }}</p>
+        <small>Why recommended: {{ item.why }}</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="recommendation-module">
+    <h3>Exercise Recommendations</h3>
+    <ul class="bullet-list">
+      {% for item in recommendations.exercise %}
+        <li><strong>{{ item.title }}</strong> — {{ item.detail }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="recommendation-module">
+    <h3>Lifestyle Recommendations</h3>
+    <ul class="bullet-list">
+      {% for item in recommendations.lifestyle %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="form-actions">
+    <a href="{{ url_for('history') }}" class="secondary-btn">Back to History</a>
+  </div>
+</div>
+{% endblock %}

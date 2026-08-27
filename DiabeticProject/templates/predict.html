@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Test / Predict | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Test / Predict{% endblock %}
+
+{% block content %}
+<div class="predict-page">
+  {% if not show_result %}
+    <div class="predict-form-card centered-form card-surface">
+      <h2>Input Your Health Information</h2>
+
+      {% if error %}
+        <div class="form-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('predict') }}" class="predict-form">
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="glucose">Glucose (mg/dL)</label>
+            <input type="number" name="glucose" id="glucose" value="{{ form_data.get('glucose', '') if form_data else '' }}" step="0.1" min="40" max="400" required />
+          </div>
+          <div class="field-group">
+            <label for="blood_pressure">Blood Pressure (mmHg)</label>
+            <input type="number" name="blood_pressure" id="blood_pressure" value="{{ form_data.get('blood_pressure', '') if form_data else '' }}" step="0.1" min="30" max="200" required />
+          </div>
+          <div class="field-group">
+            <label for="bmi">BMI (kg/m²)</label>
+            <input type="number" name="bmi" id="bmi" value="{{ form_data.get('bmi', '') if form_data else '' }}" step="0.1" min="10" max="80" required />
+            <small class="muted-text">Enter your current BMI from a recent measurement.</small>
+          </div>
+          <div class="field-group">
+            <label for="age">Age (years)</label>
+            <input type="number" name="age" id="age" value="{{ form_data.get('age', '') if form_data else '' }}" step="1" min="1" max="120" required />
+          </div>
+          <div class="field-group">
+            <label for="insulin">Insulin (µU/mL)</label>
+            <input type="number" name="insulin" id="insulin" value="{{ form_data.get('insulin', '') if form_data else '' }}" step="0.1" min="0" max="900" required />
+          </div>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="remarks">Remarks (Optional)</label>
+          <textarea name="remarks" id="remarks" rows="3" placeholder="Optional notes such as tiredness or general wellness observations.">{{ form_data.get('remarks', '') if form_data else '' }}</textarea>
+        </div>
+
+        <button type="submit" class="primary-btn full">Analyze My Risk</button>
+      </form>
+    </div>
+  {% else %}
+    <div class="predict-result-container" style="width: 100%; max-width: 900px; margin: 0 auto;">
+      <button type="button" class="back-button" onclick="window.history.back()">← Back to Test</button>
+      
+      <div class="result-layout">
+        <div class="result-card card-surface">
+          <div class="result-head">
+            <p class="eyebrow">Assessment result</p>
+            <h2>YOUR DIABETES RISK</h2>
+          </div>
+
+          <div class="risk-score-wrap">
+            <div class="risk-score">{{ prediction.score|round(0) }}%</div>
+            <div class="risk-badge" style="background: {{ prediction.category_color }};">{{ prediction.category }}</div>
+            <div class="classification-note"><strong>Model classification:</strong> {{ prediction.classification }} using the training-selected probability threshold.</div>
+          </div>
+
+          <div class="gauge-block">
+            <div class="gauge-track">
+              <div class="gauge-fill" style="width: {{ prediction.score }}%; background: {{ prediction.category_color }};"></div>
+            </div>
+          </div>
+
+          <div class="meaning-box">
+            <h3>What does this mean?</h3>
+            <p>Your model probability is shown as a percentage and grouped into an application display category.</p>
+            <p class="disclaimer-note">Binary model classification uses the probability threshold selected during training by maximizing balanced accuracy. This threshold is separate from the display bands of 0–39%, 40–69%, and 70–100%.</p>
+            <p class="disclaimer-note">This tool is for educational and risk-screening purposes only. It does not replace professional medical diagnosis, treatment, or advice.</p>
+            <p class="disclaimer-note">These risk categories are application display categories and are not medically validated diagnostic thresholds.</p>
+          </div>
+
+          <div class="pdf-download-section">
+            <a href="{{ url_for('prediction_report_pdf', prediction_id=prediction.id) }}" class="primary-btn full" style="text-decoration: none; display: inline-block; text-align: center;">Download Report (PDF)</a>
+          </div>
+        </div>
+
+        <div class="recommendations-panel">
+          <div class="recommendation-module">
+            <h3>Diet Recommendations</h3>
+            <div class="food-grid">
+              {% for item in prediction.recommendations.diet_more %}
+              <div class="food-card">
+                <div class="food-emoji">{{ item.emoji }}</div>
+                <div class="food-name">{{ item.name }}</div>
+                <p>{{ item.description }}</p>
+                <small>Why recommended: {{ item.why }}</small>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="recommendation-module">
+            <h3>Exercise Recommendations</h3>
+            <ul class="bullet-list">
+              {% for item in prediction.recommendations.exercise %}
+                <li><strong>{{ item.title }}</strong> — {{ item.detail }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="recommendation-module">
+            <h3>Lifestyle Recommendations</h3>
+            <ul class="bullet-list">
+              {% for item in prediction.recommendations.lifestyle %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="recommendation-module analytics-section">
+            <h3>📊 Personalized Health Insights</h3>
+            {% set insights = prediction.recommendations.insights %}
+            <div class="insights-container">
+              <div class="insight-header">
+                <h4>{{ insights.title }}</h4>
+              </div>
+              
+              <div class="insight-block">
+                <p class="insight-summary"><strong>{{ insights.summary }}</strong></p>
+              </div>
+
+              {% if prediction.category == "LOW RISK" %}
+                <div class="insight-block positive-tone">
+                  <p><strong>✓ What's Working:</strong> {{ insights.positive }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>💡 Maintenance:</strong> {{ insights.maintenance }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>🎯 Next Steps:</strong> {{ insights.next_steps }}</p>
+                </div>
+              {% elif prediction.category == "MODERATE RISK" %}
+                <div class="insight-block">
+                  <p><strong>⚠️ Risk Factors:</strong> {{ insights.risk_factors }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>💪 Recommended Action:</strong> {{ insights.action }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>🎯 Target Goals:</strong> {{ insights.targets }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>📋 Monitoring:</strong> {{ insights.monitoring }}</p>
+                </div>
+              {% else %}
+                <div class="insight-block alert-tone">
+                  <p><strong>⚠️ Contributing Factors:</strong> {{ insights.risk_factors }}</p>
+                </div>
+                <div class="insight-block alert-tone">
+                  <p><strong>🚨 Important:</strong> {{ insights.urgent }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>🏥 Immediate Actions:</strong> {{ insights.immediate_actions }}</p>
+                </div>
+                <div class="insight-block">
+                  <p><strong>👨‍⚕️ Professional Support:</strong> {{ insights.professional_support }}</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+

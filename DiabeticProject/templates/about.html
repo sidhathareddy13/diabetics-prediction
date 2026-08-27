@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}About | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}About{% endblock %}
+
+{% block content %}
+<div class="about-page card-surface">
+  <h2>What is Diabetes Risk Predictor?</h2>
+  <p>Diabetes Risk Predictor is an educational health screening tool designed to estimate relative risk using a trained machine learning model built from a historical diabetes dataset.</p>
+
+  <h3>How it works</h3>
+  <p>The app collects five essential health inputs: glucose, blood pressure, BMI, age, and insulin. These values are processed through the existing trained pipeline and used to estimate a risk percentage.</p>
+
+  <h3>Machine Learning explanation</h3>
+  <p>The model used in this application is the active saved <strong>XGBoost</strong> pipeline at <strong>models/balanced_best_diabetes_pipeline.pkl</strong>. It applies median imputation and returns a probability estimate from five input features.</p>
+  <p>The binary model classification threshold is selected during training by maximizing balanced accuracy on out-of-fold predictions. Separately, the application display bands are 0–39% Low, 40–69% Moderate, and 70–100% High.</p>
+
+  <h3>Input features</h3>
+  <ul>
+    <li>Glucose</li>
+    <li>Blood Pressure</li>
+    <li>BMI</li>
+    <li>Age</li>
+    <li>Insulin</li>
+  </ul>
+
+  <h3>Risk score explanation</h3>
+  <p>Application display categories are:</p>
+  <ul>
+    <li>0–39% = Low Risk</li>
+    <li>40–69% = Moderate Risk</li>
+    <li>70–100% = High Risk</li>
+  </ul>
+  <p>These categories are not medically validated diagnostic thresholds.</p>
+
+  <h3>Privacy</h3>
+  <p>User records, predictions, reminders, and health inputs are kept isolated per account. Each query uses the active authenticated user ID.</p>
+
+  <h3>Educational purpose</h3>
+  <p>This tool is for educational and risk-screening purposes only.</p>
+
+  <h3>Medical disclaimer</h3>
+  <p>This tool is for educational and risk-screening purposes only. It does not replace professional medical diagnosis, treatment, or advice.</p>
+</div>
+{% endblock %}

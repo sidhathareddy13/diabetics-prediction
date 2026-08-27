@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Reports | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Health Reports{% endblock %}
+{% block content %}
+<div class="reports-page">
+  <section class="reports-hero card-surface"><div><p class="eyebrow">Your health records</p><h2>Reports & Data</h2><p>Generate polished screening reports or export your assessment history for your own records.</p></div><div class="reports-hero-stat"><strong>{{ total_assessments }}</strong><span>Total assessments</span></div></section>
+  <div class="reports-grid">
+    <section class="report-action-card card-surface"><div class="report-icon">▣</div><div><p class="eyebrow">PDF REPORTS</p><h3>Professional health summaries</h3><p>Create a clean, patient-friendly report with your risk score, assessment values and personalized recommendations.</p></div><div class="report-actions"><a class="primary-btn" href="{{ url_for('latest_report_pdf') }}">Latest Assessment</a><a class="secondary-btn" href="{{ url_for('overall_report_pdf') }}">Full History</a></div></section>
+    <section class="report-action-card card-surface"><div class="report-icon">↗</div><div><p class="eyebrow">DATA EXPORT</p><h3>Take your data with you</h3><p>Export your assessments in common formats for analysis, coursework or personal record keeping.</p></div><div class="report-actions"><a class="secondary-btn" href="{{ url_for('export_csv') }}">Download CSV</a><a class="secondary-btn" href="{{ url_for('export_excel') }}">Download Excel</a></div></section>
+  </div>
+  <section class="card-surface report-guide"><div><p class="eyebrow">What's included</p><h3>Every report keeps the important details together</h3></div><div class="report-feature-grid"><span>✓ Risk score & category</span><span>✓ Glucose, BP & BMI</span><span>✓ Personalized recommendations</span><span>✓ Assessment dates</span><span>✓ Patient information</span><span>✓ Educational disclaimer</span></div></section>
+</div>
+{% endblock %}

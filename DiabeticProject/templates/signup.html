@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up | Diabetes Risk Predictor{% endblock %}
+
+{% block auth_content %}
+<div class="signup-screen">
+  <div class="auth-card auth-card-large">
+    <div class="brand-row brand-row-centered">
+      <div class="logo-circle">♥</div>
+      <div class="brand-text">
+        <h2>Diabetes Risk Predictor</h2>
+      </div>
+    </div>
+
+    <h2 class="center-title">Create your account</h2>
+    <p class="subtitle center">Start tracking your health with guided risk screening.</p>
+
+    {% if error %}
+      <div class="form-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('signup') }}">
+      <label class="field-label">Full Name</label>
+      <div class="input-wrap">
+        <input type="text" name="full_name" placeholder="Enter your full name" required />
+      </div>
+
+      <label class="field-label">Email</label>
+      <div class="input-wrap">
+        <input type="email" name="email" placeholder="Enter your email" required />
+      </div>
+
+      <label class="field-label">Gender</label>
+      <div class="gender-options">
+        <label class="radio-option">
+          <input type="radio" name="gender" value="Male" required />
+          <span class="radio-label">Male</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="gender" value="Female" required />
+          <span class="radio-label">Female</span>
+        </label>
+      </div>
+
+      <label class="field-label">Password</label>
+      <div class="input-wrap password-wrap">
+        <input type="password" name="password" placeholder="Create a password" required />
+      </div>
+
+      <div class="password-hint">
+        <strong>Password requirements:</strong>
+        <ul>
+          <li>At least 8 characters</li>
+          <li>Use a unique password</li>
+          <li>Keep it private and secure</li>
+        </ul>
+      </div>
+
+      <button type="submit" class="primary-btn full">Sign Up</button>
+    </form>
+
+    <div class="divider"><span>or continue with</span></div>
+
+    <div class="provider-row single-provider">
+      <a class="provider-btn provider-link" href="{{ url_for('auth_google') }}" aria-label="Continue with Google">
+        <span class="provider-icon google-icon">G</span> Continue with Google
+      </a>
+    </div>
+
+    <p class="signup-link">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  </div>
+</div>
+{% endblock %}

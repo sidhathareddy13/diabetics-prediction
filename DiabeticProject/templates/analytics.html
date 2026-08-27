@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Analytics | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+{% block body_class %}analytics-view{% endblock %}
+{% block content %}
+<div class="analytics-page">
+  <div class="analytics-header">
+    <div class="analytics-header-copy">
+      <h1>Analytics Overview</h1>
+      <p>Track your health metrics and trends</p>
+    </div>
+
+    <div class="analytics-header-controls">
+      <form class="analytics-date-form" method="get" action="{{ url_for('analytics') }}">
+        <input type="hidden" name="range" value="custom">
+        <span class="date-field date-pill">
+          <span class="calendar-icon">📅</span>
+          <input type="date" name="start" value="{{ start_value }}" aria-label="Start date">
+        </span>
+        <span class="date-separator">-</span>
+        <span class="date-field date-pill">
+          <input type="date" name="end" value="{{ end_value }}" aria-label="End date">
+        </span>
+        <button type="submit" class="apply-date-btn">Apply</button>
+      </form>
+    </div>
+  </div>
+
+  {% if not no_data %}
+    <div class="metrics-section">
+      <div class="metrics-grid">
+        <div class="metric-card glucose-metric">
+          <div class="metric-header">
+            <span class="metric-label">Avg Glucose</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ '%.1f'|format(avg_glucose) }}</span>
+          </div>
+          <div class="metric-small-text">mg/dL</div>
+          <div class="metric-preview">{{ glucose_chart|safe }}</div>
+        </div>
+
+        <div class="metric-card bp-metric">
+          <div class="metric-header">
+            <span class="metric-label">Avg Blood Pressure</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ '%.1f'|format(avg_bp) }}</span>
+          </div>
+          <div class="metric-small-text">mmHg</div>
+          <div class="metric-preview">{{ bp_chart|safe }}</div>
+        </div>
+
+        <div class="metric-card bmi-metric">
+          <div class="metric-header">
+            <span class="metric-label">Avg BMI</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ '%.1f'|format(avg_bmi) }}</span>
+          </div>
+          <div class="metric-small-text">kg/m²</div>
+          <div class="metric-preview">{{ bmi_chart|safe }}</div>
+        </div>
+
+        <div class="metric-card insulin-metric">
+          <div class="metric-header">
+            <span class="metric-label">Avg Insulin</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ '%.1f'|format(avg_insulin) }}</span>
+          </div>
+          <div class="metric-small-text">µU/mL</div>
+          <div class="metric-preview">{{ insulin_chart|safe }}</div>
+        </div>
+
+        <div class="metric-card risk-metric">
+          <div class="metric-header">
+            <span class="metric-label">Avg Risk</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ '%.1f'|format(avg_risk) }}</span>
+          </div>
+          <div class="metric-small-text">application score</div>
+          <div class="metric-preview">{{ risk_chart|safe }}</div>
+        </div>
+
+        <div class="metric-card assessment-metric">
+          <div class="metric-header">
+            <span class="metric-label">Assessments</span>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">{{ assessment_count }}</span>
+          </div>
+          <div class="metric-small-text">in selected range</div>
+          <div class="metric-preview">{{ glucose_chart|safe }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="range-selector">
+      <a href="{{ url_for('analytics', range='7') }}" class="range-btn {% if range_name == '7' %}active{% endif %}">7 Days</a>
+      <a href="{{ url_for('analytics', range='30') }}" class="range-btn {% if range_name == '30' %}active{% endif %}">30 Days</a>
+      <a href="{{ url_for('analytics', range='90') }}" class="range-btn {% if range_name == '90' %}active{% endif %}">90 Days</a>
+      <a href="{{ url_for('analytics', range='365') }}" class="range-btn {% if range_name == '365' %}active{% endif %}">1 Year</a>
+      <a href="{{ url_for('analytics', range='all') }}" class="range-btn {% if range_name == 'all' %}active{% endif %}">All Time</a>
+    </div>
+
+    <div class="analytics-grid-main">
+      <div class="chart-card chart-lg">
+        <div class="chart-title-row"><h3>Glucose (mg/dL)</h3></div>
+        <div class="chart-surface">{{ glucose_chart|safe }}</div>
+      </div>
+
+      <div class="chart-card chart-lg">
+        <div class="chart-title-row"><h3>Risk Score (%)</h3></div>
+        <div class="chart-surface">{{ risk_chart|safe }}</div>
+      </div>
+
+      <div class="chart-card chart-lg">
+        <div class="chart-title-row"><h3>Blood Pressure (mmHg)</h3></div>
+        <div class="chart-surface">{{ bp_chart|safe }}</div>
+      </div>
+
+      <div class="chart-card chart-lg">
+        <div class="chart-title-row"><h3>BMI (kg/m²)</h3></div>
+        <div class="chart-surface">{{ bmi_chart|safe }}</div>
+      </div>
+
+      <div class="chart-card chart-md">
+        <div class="chart-title-row"><h3>Insulin (µU/mL)</h3></div>
+        <div class="chart-surface">{{ insulin_chart|safe }}</div>
+      </div>
+
+      <div class="chart-card distribution-card">
+        <div class="chart-title-row"><h3>Risk Distribution</h3></div>
+        <div class="distribution-layout">
+          <div class="distribution-donut">{{ risk_distribution_chart|safe }}</div>
+          <div class="distribution-legend">
+            <div class="distribution-row low">
+              <span class="legend-label">Low Risk (0-39)</span>
+              <span class="legend-value">{{ summary.get('LOW RISK', 0) }} ({{ '%.0f'|format((summary.get('LOW RISK', 0) / (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) * 100)) if (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) else 0 }}%)</span>
+            </div>
+            <div class="distribution-row moderate">
+              <span class="legend-label">Moderate Risk (40-69)</span>
+              <span class="legend-value">{{ summary.get('MODERATE RISK', 0) }} ({{ '%.0f'|format((summary.get('MODERATE RISK', 0) / (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) * 100)) if (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) else 0 }}%)</span>
+            </div>
+            <div class="distribution-row high">
+              <span class="legend-label">High Risk (70-100)</span>
+              <span class="legend-value">{{ summary.get('HIGH RISK', 0) }} ({{ '%.0f'|format((summary.get('HIGH RISK', 0) / (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) * 100)) if (summary.get('LOW RISK', 0) + summary.get('MODERATE RISK', 0) + summary.get('HIGH RISK', 0)) else 0 }}%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-panel">
+        <div class="insight-header-row"><h3>Personalized Insight</h3></div>
+        <div class="insight-box">
+          {% if insights %}
+            <p>{{ insights[0] }}</p>
+          {% else %}
+            <p>More assessments are needed to identify a meaningful trend.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <h3>No analytics available</h3>
+      <p>Complete an assessment to start building your health trends.</p>
+      <a href="{{ url_for('predict') }}" class="primary-btn">Start Assessment</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

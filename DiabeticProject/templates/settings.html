@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Settings | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<div class="settings-page">
+  <section class="settings-hero card-surface"><div><p class="eyebrow">Personalize your workspace</p><h2>Settings & Preferences</h2><p>Control the appearance, alerts and account security of your DiabetesCare experience.</p></div><div class="settings-hero-icon">⚙</div></section>
+
+  <div class="settings-layout">
+    <section class="card-surface settings-card">
+      <div class="section-heading"><div><p class="eyebrow">Appearance</p><h3>Choose your theme</h3></div><span class="section-icon">◐</span></div>
+      <form method="post" id="settingsForm">
+        {% set current_theme = (user.theme if user and user.theme else 'light') %}
+        <div class="theme-choice-grid">
+          <label class="theme-choice {% if current_theme != 'dark' %}selected{% endif %}"><input type="radio" name="theme" value="light" {% if current_theme != 'dark' %}checked{% endif %}><span class="theme-preview light-preview"><i></i><b></b><em></em></span><strong>Light</strong><small>Bright, clean workspace</small></label>
+          <label class="theme-choice {% if current_theme == 'dark' %}selected{% endif %}"><input type="radio" name="theme" value="dark" {% if current_theme == 'dark' %}checked{% endif %}><span class="theme-preview dark-preview"><i></i><b></b><em></em></span><strong>Dark</strong><small>Comfortable low-light view</small></label>
+        </div>
+        <div class="settings-divider"></div>
+        <label class="setting-toggle"><span><strong>Reminder alerts</strong><small>Keep active reminders visible.</small></span><input type="checkbox" name="reminders_enabled" {% if user.reminders_enabled %}checked{% endif %}><i></i></label>
+        <button class="primary-btn" type="submit">Save Preferences</button>
+      </form>
+    </section>
+
+    <section class="card-surface settings-card password-card">
+      <div class="section-heading"><div><p class="eyebrow">Security</p><h3>Change Password</h3></div><span class="section-icon">🔒</span></div>
+      <p class="settings-description">Use a strong password with at least 8 characters. Your password is securely hashed before it is stored.</p>
+      {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+      <form method="post" action="{{ url_for('change_password') }}" class="password-form">
+        <div class="password-field"><label>Current Password</label><div class="password-input"><span>●</span><input type="password" name="current_password" required placeholder="Enter current password"><button type="button" class="password-toggle" data-target="current_password">Show</button></div></div>
+        <div class="password-field"><label>New Password</label><div class="password-input"><span>●</span><input type="password" name="new_password" minlength="8" required placeholder="Create a new password"><button type="button" class="password-toggle" data-target="new_password">Show</button></div></div>
+        <div class="password-field"><label>Confirm New Password</label><div class="password-input"><span>●</span><input type="password" name="confirm_password" minlength="8" required placeholder="Repeat your new password"><button type="button" class="password-toggle" data-target="confirm_password">Show</button></div></div>
+        <div class="password-strength"><span>Password checklist</span><div><i></i><i></i><i></i><i></i></div><small id="passwordHint">Use 8+ characters for a stronger password.</small></div>
+        <button class="secondary-btn settings-wide-btn" type="submit">Update Password</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="card-surface danger-zone"><div><p class="eyebrow">Account</p><h3>Delete Account</h3><p>This permanently removes your account and associated assessments, notifications and reminders.</p></div><form method="post" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Delete your account permanently?');"><button class="danger-btn" type="submit">Delete Account</button></form></section>
+</div>
+<script>
+(function(){
+  const form = document.getElementById('settingsForm');
+  const applyTheme = function(theme){
+    if (!['light','dark'].includes(theme)) theme = 'light';
+    document.body.dataset.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+    document.querySelectorAll('.theme-choice').forEach(x => x.classList.toggle('selected', x.querySelector('input').value === theme));
+  };
+
+  document.querySelectorAll('.theme-choice input').forEach(input => input.addEventListener('change', function () {
+    const theme = this.value;
+    applyTheme(theme);
+    fetch('{{ url_for('settings') }}', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({ theme: theme }).toString()
+    }).catch(function () {});
+  }));
+
+  document.querySelectorAll('.password-toggle').forEach(btn => btn.addEventListener('click', () => {
+    const field = document.querySelector('[name="' + btn.dataset.target + '"]');
+    if (!field) return;
+    const visible = field.type === 'text';
+    field.type = visible ? 'password' : 'text';
+    btn.textContent = visible ? 'Show' : 'Hide';
+  }));
+
+  const newPass = document.querySelector('[name="new_password"]'), hint = document.getElementById('passwordHint');
+  if (newPass && hint) newPass.addEventListener('input', () => {
+    const v = newPass.value;
+    const score = (v.length >= 8) + (/[A-Z]/.test(v)) + (/[0-9]/.test(v)) + (/[^A-Za-z0-9]/.test(v));
+    hint.textContent = score >= 4 ? 'Strong password' : score >= 2 ? 'Good start — add length or variety.' : 'Use 8+ characters for a stronger password.';
+  });
+})();
+</script>
+{% endblock %}

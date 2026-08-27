@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Diabetes Risk Predictor{% endblock %}
+
+{% block auth_content %}
+<div class="auth-layout">
+  <section class="auth-hero">
+    <div class="brand-row">
+      <div class="logo-circle">♥</div>
+      <div class="brand-text">
+        <h2>Diabetes Risk Predictor</h2>
+        <p>AI-Powered Diabetes Risk Assessment</p>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <h1>Take control of your health, today.</h1>
+      <p>Assess your diabetes risk, track your health trends, and build a healthier tomorrow with personalized insights and recommendations.</p>
+    </div>
+
+    <div class="illustration-wrap">
+      <div class="health-illustration">
+        <div class="clip-board">
+          <div class="clip-board-line"></div>
+          <div class="clip-board-line short"></div>
+          <div class="clip-board-line"></div>
+          <div class="clip-board-row">
+            <span class="mini-bars"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+        <div class="device-card">
+          <span>5.6</span>
+          <small>mmol/L</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="benefit-row">
+      <div class="benefit-item">
+        <span class="benefit-icon">🔒</span>
+        <div>
+          <strong>Secure &amp; Private</strong>
+          <p>Your data is safe with us.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">📈</span>
+        <div>
+          <strong>Track &amp; Analyze</strong>
+          <p>Monitor your health over time.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">💡</span>
+        <div>
+          <strong>Smart Insights</strong>
+          <p>Get personalized recommendations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">Login to continue to your account</p>
+
+      {% if error %}
+        <div class="form-error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('login') }}">
+        <label class="field-label">Email Address</label>
+        <div class="input-wrap">
+          <input type="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="row-between">
+          <label class="field-label">Password</label>
+          <a href="#" class="link-purple">Forgot Password?</a>
+        </div>
+        <div class="input-wrap password-wrap">
+          <input type="password" name="password" placeholder="Enter your password" required />
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" checked />
+          <span>Remember me</span>
+        </label>
+
+        <button type="submit" class="primary-btn full">Login</button>
+      </form>
+
+      {% if oauth_configured %}<div class="divider"><span>or continue with</span></div>
+
+      <div class="provider-row single-provider">
+        <a class="provider-btn provider-link" href="{{ url_for('auth_google') }}" aria-label="Continue with Google">
+          <span class="provider-icon google-icon">G</span> Continue with Google
+        </a>
+      </div>{% endif %}
+
+      <p class="signup-link">Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
+    </div>
+
+    <div class="security-note">
+      <span>✓</span>
+      <div>
+        <strong>Your health data is encrypted and secure.</strong>
+        <p>We respect your privacy. Read our <a href="#">Privacy Policy</a>.</p>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

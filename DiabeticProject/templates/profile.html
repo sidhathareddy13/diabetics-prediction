@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Profile | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="profile-page">
+  <section class="profile-hero card-surface">
+    <div class="profile-avatar">{{ (user.full_name or 'U')[0]|upper }}</div>
+    <div class="profile-hero-copy">
+      <p class="eyebrow">Personal health profile</p>
+      <h2>{{ user.full_name or 'Your Profile' }}</h2>
+      <p>{{ user.email }}</p>
+      <span class="profile-status"><span></span> Account active</span>
+    </div>
+    <div class="profile-hero-stat"><strong>{{ assessment_count }}</strong><span>Assessments</span></div>
+  </section>
+
+  {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+
+  <div class="profile-layout">
+    <section class="card-surface profile-card">
+      <div class="section-heading"><div><p class="eyebrow">Account details</p><h3>Personal Information</h3></div><span class="section-icon">✦</span></div>
+      <form method="post" class="profile-form">
+        <div class="profile-field full-span"><label>Full Name</label><div class="profile-input-wrap"><span>👤</span><input name="full_name" value="{{ user.full_name }}" required></div></div>
+        <div class="profile-field"><label>Email Address</label><div class="profile-input-wrap readonly"><span>✉</span><input value="{{ user.email }}" disabled></div><small>Login email cannot be changed here.</small></div>
+        <div class="profile-field"><label>Gender</label><div class="profile-input-wrap"><span>◉</span><select name="gender"><option value="">Select gender</option><option value="Male" {% if user.gender=='Male' %}selected{% endif %}>Male</option><option value="Female" {% if user.gender=='Female' %}selected{% endif %}>Female</option><option value="Other" {% if user.gender=='Other' %}selected{% endif %}>Other</option></select></div></div>
+        <div class="profile-field"><label>Age</label><div class="profile-input-wrap"><span>◷</span><input type="number" name="age" value="{{ user.age or '' }}" min="1" max="120"></div></div>
+        <div class="profile-field"><label>Height</label><div class="profile-input-wrap"><span>↕</span><input type="number" step="0.1" name="height_cm" value="{{ user.height_cm or '' }}" min="50" max="250"><b>cm</b></div></div>
+        <div class="profile-field"><label>Weight</label><div class="profile-input-wrap"><span>⚖</span><input type="number" step="0.1" name="weight_kg" value="{{ user.weight_kg or '' }}" min="20" max="300"><b>kg</b></div></div>
+        <div class="full-span profile-actions"><button class="primary-btn" type="submit">Save Profile Changes</button></div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

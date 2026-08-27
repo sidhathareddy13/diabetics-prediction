@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Reminder | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Add Reminder{% endblock %}
+
+{% block content %}
+<div class="form-grid-2">
+  <div class="card-surface reminder-form-panel">
+    <h3>{% if edit_mode %}Edit Reminder{% else %}Add New Reminder{% endif %}</h3>
+    {% if error %}
+      <div class="form-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" class="reminder-form">
+      <div class="field-group">
+        <label>Reminder Title *</label>
+        <input type="text" name="title" value="{{ reminder.title if reminder else '' }}" required />
+      </div>
+
+      <div class="field-group">
+        <label>Description (Optional)</label>
+        <textarea name="description" rows="3">{{ reminder.description if reminder else '' }}</textarea>
+      </div>
+
+      <div class="split-row">
+        <div class="field-group">
+          <label>Date *</label>
+          <input type="date" name="date" value="{{ reminder.date if reminder else '' }}" required />
+        </div>
+        <div class="field-group">
+          <label>Time *</label>
+          <input type="time" name="time" value="{{ reminder.time if reminder else '' }}" required />
+        </div>
+      </div>
+
+      <div class="split-row">
+        <div class="field-group">
+          <label>Repeat</label>
+          <select name="repeat">
+            <option {% if reminder and reminder.repeat == 'Once' %}selected{% endif %}>Once</option>
+            <option {% if reminder and reminder.repeat == 'Daily' %}selected{% endif %}>Daily</option>
+            <option {% if reminder and reminder.repeat == 'Weekly' %}selected{% endif %}>Weekly</option>
+            <option {% if reminder and reminder.repeat == 'Monthly' %}selected{% endif %}>Monthly</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>End Repeat</label>
+          <input type="text" placeholder="Optional" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Category</label>
+        <select name="category">
+          <option {% if reminder and reminder.category == 'Medications' %}selected{% endif %}>Medications</option>
+          <option {% if reminder and reminder.category == 'Health Checkups' %}selected{% endif %}>Health Checkups</option>
+          <option {% if reminder and reminder.category == 'Lifestyle' %}selected{% endif %}>Lifestyle</option>
+          <option {% if reminder and reminder.category == 'Others' %}selected{% endif %}>Others</option>
+        </select>
+      </div>
+
+      <div class="checkbox-row">
+        <label><input type="checkbox" name="notification_enabled" {% if reminder and reminder.notification_enabled %}checked{% endif %}> Enable notifications</label>
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('reminders') }}" class="secondary-btn">Cancel</a>
+        <button type="submit" class="primary-btn">Save Reminder</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-surface preview-panel">
+    <h3>Reminder Preview</h3>
+    <div class="reminder-preview-box">
+      <strong>{{ reminder.title if reminder else 'Reminder Title' }}</strong>
+      <p>{{ reminder.description if reminder else 'Description preview appears here.' }}</p>
+      <div class="preview-meta">
+        <span>{{ ((reminder.date ~ ' ' ~ reminder.time)|display_datetime) if reminder else 'Date / Time' }}</span>
+      </div>
+      <div class="preview-meta">
+        <span>{{ reminder.repeat if reminder else 'Once' }}</span>
+        <span>{{ reminder.category if reminder else 'Lifestyle' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

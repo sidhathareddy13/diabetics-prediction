@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Reminders | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Reminders{% endblock %}
+
+{% block content %}
+<div class="reminders-page">
+  <div class="page-header-row">
+    <div class="summary-row">
+      <div class="mini-stat card-surface"><span>Total Reminders</span><strong>{{ total }}</strong></div>
+      <div class="mini-stat card-surface"><span>Completed Today</span><strong>{{ completed_today }}</strong></div>
+      <div class="mini-stat card-surface"><span>Upcoming Today</span><strong>{{ upcoming_today }}</strong></div>
+      <div class="mini-stat card-surface"><span>Overdue</span><strong>{{ overdue }}</strong></div>
+    </div>
+    <a href="{{ url_for('add_reminder') }}" class="primary-btn">Add New Reminder</a>
+  </div>
+
+  {% set upcoming_reminders = reminders|selectattr('status', 'equalto', 'UPCOMING')|list %}
+  {% set overdue_reminders = reminders|selectattr('status', 'equalto', 'OVERDUE')|list %}
+  {% set completed_reminders = reminders|selectattr('status', 'equalto', 'COMPLETED')|list %}
+
+  <div class="reminders-tabs">
+    <h3>UPCOMING</h3>
+    {% if upcoming_reminders %}
+      <div class="reminder-list card-surface">
+        {% for reminder in upcoming_reminders %}
+          <div class="reminder-item">
+            <div class="reminder-main">
+              <h4>{{ reminder.title }}</h4>
+              <p>{{ reminder.description or 'No description provided.' }}</p>
+            </div>
+            <div class="reminder-meta">
+              <span>Date / Time: {{ (reminder.date ~ ' ' ~ reminder.time)|display_datetime }}</span>
+              <span>Repeat: {{ reminder.repeat }}</span>
+              <span>Category: {{ reminder.category }}</span>
+            </div>
+            <div class="reminder-actions">
+              <a href="{{ url_for('edit_reminder', reminder_id=reminder.id) }}" class="reminder-action-btn edit">Edit</a>
+              <a href="{{ url_for('delete_reminder', reminder_id=reminder.id) }}" class="reminder-action-btn delete">Delete</a>
+              <form method="post" action="{{ url_for('complete_reminder', reminder_id=reminder.id) }}">
+                <button type="submit" class="reminder-action-btn complete">✓ Complete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No upcoming reminders.</div>
+    {% endif %}
+  </div>
+
+  <div class="reminders-tabs">
+    <h3>OVERDUE</h3>
+    {% if overdue_reminders %}
+      <div class="reminder-list card-surface">
+        {% for reminder in overdue_reminders %}
+          <div class="reminder-item">
+            <div class="reminder-main">
+              <h4>{{ reminder.title }}</h4>
+              <p>{{ reminder.description or 'No description provided.' }}</p>
+            </div>
+            <div class="reminder-meta">
+              <span>Date / Time: {{ (reminder.date ~ ' ' ~ reminder.time)|display_datetime }}</span>
+              <span>Repeat: {{ reminder.repeat }}</span>
+              <span>Category: {{ reminder.category }}</span>
+            </div>
+            <div class="reminder-actions">
+              <a href="{{ url_for('edit_reminder', reminder_id=reminder.id) }}" class="reminder-action-btn edit">Edit</a>
+              <a href="{{ url_for('delete_reminder', reminder_id=reminder.id) }}" class="reminder-action-btn delete">Delete</a>
+              <form method="post" action="{{ url_for('complete_reminder', reminder_id=reminder.id) }}">
+                <button type="submit" class="reminder-action-btn complete">✓ Complete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No overdue reminders.</div>
+    {% endif %}
+  </div>
+
+  <div class="reminders-tabs">
+    <h3>COMPLETED</h3>
+    {% if completed_reminders %}
+      <div class="reminder-list card-surface">
+        {% for reminder in completed_reminders %}
+          <div class="reminder-item">
+            <div class="reminder-main">
+              <h4>{{ reminder.title }}</h4>
+              <p>{{ reminder.description or 'No description provided.' }}</p>
+            </div>
+            <div class="reminder-meta">
+              <span>Date / Time: {{ (reminder.date ~ ' ' ~ reminder.time)|display_datetime }}</span>
+              <span>Repeat: {{ reminder.repeat }}</span>
+              <span>Category: {{ reminder.category }}</span>
+            </div>
+            <div class="reminder-actions">
+              <span class="completed-badge">✓ Completed</span>
+              <a href="{{ url_for('delete_reminder', reminder_id=reminder.id) }}" class="reminder-action-btn delete">Delete</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">No completed reminders.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

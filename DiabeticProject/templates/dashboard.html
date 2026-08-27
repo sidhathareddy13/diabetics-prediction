@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Diabetes Risk Predictor{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+  <section class="panel card-surface">
+    <div class="card-header">
+      <h3>Latest Prediction</h3>
+    </div>
+    {% if latest %}
+      <div class="latest-score-box">
+        <div class="score-wrap">
+          <div class="score-number">{{ latest.risk_score|round(0) }}%</div>
+          <div class="score-label" style="color: {{ latest.risk_category|replace('LOW RISK', '#16a34a')|replace('MODERATE RISK', '#f59e0b')|replace('HIGH RISK', '#dc2626') }};">{{ latest.risk_category }}</div>
+        </div>
+        <div class="meta-row">
+          <span>Date / Time</span>
+          <strong>{{ latest.created_at|display_datetime }}</strong>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state">No predictions yet.</div>
+    {% endif %}
+  </section>
+
+  <section class="panel card-surface">
+    <div class="card-header">
+      <h3>Risk Trend</h3>
+    </div>
+    {% if predictions %}
+      {{ trend_svg|safe }}
+    {% else %}
+      <div class="empty-state">No risk trend available yet.</div>
+    {% endif %}
+  </section>
+
+  <section class="panel card-surface full-span quick-health-tips-panel">
+    <div class="card-header">
+      <h3>Quick Health Tips</h3>
+    </div>
+    <div class="tips-content">
+      {% if quick_tips %}
+        {% for tip in quick_tips %}
+          <div class="tip-card">{{ tip }}</div>
+        {% endfor %}
+      {% else %}
+        <div class="tip-card">Start with a balanced routine: maintain regular meals, hydration, and daily movement.</div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}
